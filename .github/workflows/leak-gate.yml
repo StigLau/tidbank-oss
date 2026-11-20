@@ -1,0 +1,27 @@
+# Public repo hygiene: no secrets, no local paths, no agent session ids in files or commit messages.
+name: Leak gate
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  leaks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: No local paths or session ids
+        run: |
+          pat='/Users/[A-Za-z]|/home/[a-z]+/|Claude-Session|agent-run v1|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+          rc=0
+          if git grep -nIE "$pat" -- . ':!.github/workflows/leak-gate.yml'; then rc=1; fi
+          base="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -n "$base" ] && [ "$base" != "0000000000000000000000000000000000000000" ] && git cat-file -e "$base" 2>/dev/null; then
+            range="$base..HEAD"; else range="HEAD"; fi
+          if git log --format=%B $range | grep -nE "$pat"; then echo "commit message carries a session id or local path"; rc=1; fi
+          exit $rc

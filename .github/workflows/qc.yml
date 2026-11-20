@@ -1,0 +1,22 @@
+# QC on every push and PR: the JUCE-free part (dsp/ unit tests + the ears suite) on Linux, about 2 minutes.
+# The plugin tests (JUCE, AU, pluginval) run locally: `make check` (Linux only here: macOS CI minutes cost 10x).
+name: QC
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: qc-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test-and-ears:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Unit tests (dsp, feedback, bbd, reel, filtaer)
+        run: make test CMAKE=cmake
+      - name: Ears (offline render + measurement)
+        run: make ears CMAKE=cmake
