@@ -1,14 +1,15 @@
-# Everyone hates reporting time. My pet peeve is TidBank
+# Everyone hates AI. The problem is most don't really know why...
 
-*Tid* is Norwegian for time. A *tidbank* is the flexitime account at work that you are supposed to fill in every Friday. This TidBank only banks time in a tape loop: it is a tape echo, written and measured by AI agents, with a human who listens and decides.
+*TidBank*, Norwegian for Time Bank, is an Agentic driven project for designing, analyzing and developing audio software. Just for fun, as part of the AI enshittification. The project is intended for teaching people about agentic development - showing how to do Agentic better. 
+The whole project is yolo-developed, but based off software-engineering practices.
 
 **[BLACK WEEK OF DEATH: everything 9999999999999999999999991 % off →](https://stiglau.github.io/tidbank-oss/)**
 
 ## What is in here
 | | What it is |
 |---|---|
-| **TidBank** | A tape echo in the style of the Roland RE-201 and Strymon Volante. It has an exact tape-transport model: three playback heads, tempo sync with a nudge, speed inertia that glides the pitch of the repeats like a real motor, and a feedback loop with HPF, LPF and record-head saturation. It also has a BBD (bucket-brigade) engine with profiles kept as data. |
-| **Reels** | A reel-only looper locked to the host's bar grid. |
+| **TidBank** | A tape echo in the style of the Roland RE-201 and Strymon Volante. It has an exact tape-transport model: three playback heads, tempo sync with a nudge, speed inertia that glides the pitch of the repeats like a real motor, and a feedback loop with HPF, LPF and record-head saturation. It also has a BBD (bucket-brigade) engine with profiles such as Matriarch simulation. |
+| **Reels** | A simple looper with tape-style controls and undo-functionality |
 | **Filtær** | A stereo filter with two ZDF ladder filters, modelled on the Moog Matriarch's filter section and checked against one measured unit. |
 | **The ears** (`tools/ears/`) | Offline rendering and numeric measurement of timing, glides, aliasing, clicks, stability and spectrum. Agents can't listen, so every claim about the sound is measured here. |
 | **The hardware bench** (`tools/matriarch/`, `docs/research/matriarch-*.md`) | How an agent measures a real synth over MIDI and audio with a human at the panel: the rig, the scripts, the traps, and the measured numbers, so you can test your own model against them. |
@@ -47,3 +48,8 @@ Docs: `docs/whitepaper.md` (architecture, routing, latency, tape/BBD), `docs/des
 - **The plugins** (`plugin/`, `reels/`, `filtaer/` and any binary built with JUCE): AGPLv3 ([LICENSE](LICENSE)), because JUCE 9 is AGPLv3 or commercial. If the plugins move off JUCE, this may change.
 
 Third-party code, sources and trademarks are listed in [NOTICE.md](NOTICE.md).
+
+## Contribution and support
+I'm open to take in PR contributions and tests/metering of other devices.
+Support small devs and musicians! 
+I'm not asking for anything. This is my contribution to others.
