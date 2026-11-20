@@ -2,7 +2,7 @@
 
 *Tid* is Norwegian for time. A *tidbank* is the flexitime account at work that you are supposed to fill in every Friday. This TidBank only banks time in a tape loop: it is a tape echo, written and measured by AI agents, with a human who listens and decides.
 
-**[BLACK WEEK OF DEATH: everything 100 % off →](https://stiglau.github.io/tidbank-oss/)**
+**[BLACK WEEK OF DEATH: everything 9999999999999999999999991 % off →](https://stiglau.github.io/tidbank-oss/)**
 
 ## What is in here
 | | What it is |
