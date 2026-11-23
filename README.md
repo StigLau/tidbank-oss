@@ -17,9 +17,22 @@ The whole project is yolo-developed, but based off software-engineering practice
 
 The core in `dsp/` is header-only C++17 with no JUCE dependency and no allocation after `prepare()`. The plugins (VST3/AU/Standalone, arm64 macOS) wrap that core in JUCE 9.
 
-## Jump aboard, agentically
+## Audit it before you run it
+> **This repo contains instructions for AI agents** (`CLAUDE.md`, `.claude/skills/`). Once you open an agent in it, those instructions act with your shell and your files. The same goes for every project and skill you download, so **QC and security-audit it first**, this one included.
+
+The short version. Stay outside the project, and ask an agent that can only read:
 ```sh
-git clone https://github.com/StigLau/tidbank-oss && cd tidbank-oss
+mkdir audit && cd audit && git clone https://github.com/StigLau/tidbank-oss
+# put prompt A from the guide in prompt.txt, then use one of these, or better both:
+claude -p --safe-mode --restricted --strict-mcp-config --tools "Read,Grep,Glob" --no-session-persistence < prompt.txt
+pi -p --no-approve --no-context-files --no-skills --no-extensions --no-prompt-templates --no-mcp --no-session --tools read,grep,find,ls "$(cat prompt.txt)"
+```
+**[docs/security-audit.md](docs/security-audit.md)** has the prompts (whole project, a single skill, an update, and QC of the claims), a check for hidden characters, and what an audit can't tell you. Read the skills yourself too: an agent's silence is not evidence.
+
+## Jump aboard, agentically
+When you are happy with what you found:
+```sh
+cd tidbank-oss
 claude          # or your agent of choice; CLAUDE.md and .claude/skills/ tell it how this repo works
 ```
 Then ask it to run `make test`, or to change something and prove the change with the ears.
