@@ -1,0 +1,102 @@
+# Plugin binaries: macOS (arm64: VST3, AU, Standalone) and Linux (x86_64: VST3, Standalone).
+# Pull requests and manual runs build, test and keep the zips as run artifacts. A tag v<version>* also publishes a release.
+# Everything fetched is pinned: actions and JUCE by commit, pluginval by sha256. Only the release job can write.
+name: Build
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+    paths: [dsp/**, plugin/**, reels/**, filtaer/**, tests/**, cmake/**, CMakeLists.txt, tools/release/**, .github/workflows/build.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+env:
+  JUCE_SHA: d60b7a78030661574a615b586d9325ba7a7fa7dd  # JUCE 9.0.5, the tag CMakeLists.txt names
+  PLUGINVAL: https://github.com/Tracktion/pluginval/releases/download/v1.0.4
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-22.04, name: Linux-x86_64, pv: pluginval_Linux.zip, pvsha: c01c49d8063965c4c2dea8324468336768f5c9139e0b1caebde14c2400b55352 }
+          - { os: macos-15, name: macOS-arm64, pv: pluginval_macOS.zip, pvsha: 3c4c533bda0c5059eea3ddaea752d757ee2025041f0f47e6bcb0e87f6082b29f }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          repository: juce-framework/JUCE
+          ref: ${{ env.JUCE_SHA }}
+          path: build/juce
+          persist-credentials: false
+      - name: Linux packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends xvfb xauth libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev \
+            libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libxi-dev libfreetype-dev libfontconfig1-dev libgl1-mesa-dev
+      - name: Build (never installs)
+        run: |
+          cmake -B build/release -DTIDBANK_BUILD_PLUGIN=ON -DTIDBANK_COPY_PLUGIN=OFF -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DFETCHCONTENT_SOURCE_DIR_JUCE="$PWD/build/juce"
+          cmake --build build/release -j4
+      - name: Unit tests
+        run: cd build/release && ctest --output-on-failure
+      - name: Plugin tests
+        run: |
+          for t in tidbank reels filtaer; do
+            ${{ runner.os == 'Linux' && 'xvfb-run -a' || '' }} "build/release/${t}_plugin_tests_artefacts/Release/${t}_plugin_tests"
+          done
+      - name: Package
+        run: tools/release/package.sh build/release "${{ matrix.name }}" build/dist "$JUCE_SHA"
+      - name: pluginval (strictness 5, on the packaged files)
+        run: |
+          curl -fsSL -o build/pluginval.zip "$PLUGINVAL/${{ matrix.pv }}"
+          echo "${{ matrix.pvsha }}  build/pluginval.zip" | shasum -a 256 -c -
+          mkdir -p build/pv build/check && unzip -q build/pluginval.zip -d build/pv
+          unzip -q "build/dist/TidBank-${{ matrix.name }}.zip" -d build/check
+          tools/release/validate.sh "build/check/TidBank-${{ matrix.name }}" build/pv
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: TidBank-${{ matrix.name }}
+          path: build/dist/*.zip
+          if-no-files-found: error
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: The tag matches the CMake version and is on main
+        run: |
+          v=$(sed -nE 's/^project\(TidBank VERSION ([0-9.]+).*/\1/p' CMakeLists.txt)
+          case "$GITHUB_REF_NAME" in "v$v"|"v$v"-*) ;; *) echo "tag $GITHUB_REF_NAME does not match version $v"; exit 1 ;; esac
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Checksums
+        run: cd dist && sha256sum -- *.zip | tee SHA256SUMS
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: dist/*.zip
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.zip dist/SHA256SUMS --verify-tag --title "TidBank $GITHUB_REF_NAME" --notes-file tools/release/NOTES.md

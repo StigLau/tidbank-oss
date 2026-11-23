@@ -1,0 +1,17 @@
+TidBank, Reels and Filtaer: audio plugins built by GitHub Actions (see SOURCE.txt for the exact commit).
+
+BEFORE YOU INSTALL: a plugin runs with your user's rights inside your DAW. Check that the zip is the one CI built:
+  gh attestation verify TidBank-<platform>.zip --repo StigLau/tidbank-oss
+That proves where it was built, not that the code is safe. To judge the code, see docs/security-audit.md in the repo.
+Building from audited source is the safest way to install.
+
+macOS (Apple silicon, macOS 11 or later)
+  VST3 -> ~/Library/Audio/Plug-Ins/VST3/        AU -> ~/Library/Audio/Plug-Ins/Components/
+  The plugins are ad-hoc signed and NOT notarized by Apple, so macOS blocks a downloaded copy. If you have verified the
+  zip and accept that, clear the quarantine flag on these bundles only:
+    xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/TidBank.vst3      (and each one you install)
+
+Linux (x86_64, glibc 2.35 or later, for example Ubuntu 22.04)
+  VST3 -> ~/.vst3/                              Standalone: run it from where it is.
+
+Keep the volume low the first time: the feedback loop can run away on purpose. PANIC silences it.
