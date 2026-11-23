@@ -15,7 +15,15 @@ The whole project is yolo-developed, but based off software-engineering practice
 | **The hardware bench** (`tools/matriarch/`, `docs/research/matriarch-*.md`) | How an agent measures a real synth over MIDI and audio with a human at the panel: the rig, the scripts, the traps, and the measured numbers, so you can test your own model against them. |
 | **Skills** (`.claude/skills/`) | What an agent needs to know to work on each part: the build, the tests, the model facts and the traps already hit. |
 
-The core in `dsp/` is header-only C++17 with no JUCE dependency and no allocation after `prepare()`. The plugins (VST3/AU/Standalone, arm64 macOS) wrap that core in JUCE 9.
+The core in `dsp/` is header-only C++17 with no JUCE dependency and no allocation after `prepare()`. The plugins (VST3/AU/Standalone on arm64 macOS, VST3/Standalone on x86_64 Linux) wrap that core in JUCE 9.
+
+## Downloads
+| | Formats |
+|---|---|
+| [macOS (Apple silicon)](https://github.com/StigLau/tidbank-oss/releases/latest/download/TidBank-macOS-arm64.zip) | VST3, AU, Standalone. macOS 11 or later. Ad-hoc signed, **not notarized** |
+| [Linux (x86_64)](https://github.com/StigLau/tidbank-oss/releases/latest/download/TidBank-Linux-x86_64.zip) | VST3, Standalone. glibc 2.35 or later. Validated in CI, not yet listened to in a DAW |
+
+Built by [GitHub Actions](.github/workflows/build.yml). Check where a zip came from with `gh attestation verify <zip> --repo StigLau/tidbank-oss`, or against [SHA256SUMS](https://github.com/StigLau/tidbank-oss/releases/latest/download/SHA256SUMS). Install steps are in `INSTALL.txt` in the zip. Release notes: [releases](https://github.com/StigLau/tidbank-oss/releases).
 
 ## Audit it before you run it
 > **This repo contains instructions for AI agents** (`CLAUDE.md`, `.claude/skills/`). Once you open an agent in it, those instructions act with your shell and your files. The same goes for every project and skill you download, so **QC and security-audit it first**, this one included.
