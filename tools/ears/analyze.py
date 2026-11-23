@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["numpy"]
+# ///
 """TidBank ears, step 2: measure a rendered WAV. Numbers, never plots, are the agent's evidence
 (an earlier benchmark: VLMs read spectrograms at chance level). Prints JSON; exit 1 on a failed check.
-Run: uv run --with numpy tools/ears/analyze.py <cmd> file.wav [opts]   (first channel of the WAV is analysed)
+Run: uv run --locked --script tools/ears/analyze.py <cmd> file.wav [opts]   (first channel of the WAV is analysed)
 
   taps        echo times + levels; --expect-ms N checks tap k at k*N within --tol-ms
   spectrum    per-tap spectral SHAPE vs tap 1, in dB at --freqs, normalised to 1 kHz (isolates filtering from level)

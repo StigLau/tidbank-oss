@@ -14,7 +14,6 @@ concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 env:
-  JUCE_SHA: d60b7a78030661574a615b586d9325ba7a7fa7dd  # JUCE 9.0.5, the tag CMakeLists.txt names
   PLUGINVAL: https://github.com/Tracktion/pluginval/releases/download/v1.0.4
 jobs:
   build:
@@ -30,6 +29,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
+      - name: JUCE commit from CMakeLists.txt
+        run: |
+          sha=$(sed -nE 's/^ *GIT_TAG +([0-9a-f]{40})( .*)?$/\1/p' CMakeLists.txt)
+          [ "${#sha}" = 40 ] || { echo "expected one 40-digit GIT_TAG in CMakeLists.txt, got: $sha"; exit 1; }
+          echo "JUCE_SHA=$sha" >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           repository: juce-framework/JUCE

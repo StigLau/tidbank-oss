@@ -5,7 +5,7 @@ set -e
 cd "$(dirname "$0")/../.."
 O=build/s8; mkdir -p $O
 R=build/tidbank_render
-loop() { if [ -n "$S8_IN" ]; then echo "$S8_IN"; else uv run --quiet --with numpy tools/ears/drumloop.py $O/loop_$1.wav --bpm $1 >/dev/null; echo $O/loop_$1.wav; fi; }
+loop() { if [ -n "$S8_IN" ]; then echo "$S8_IN"; else uv run --quiet --locked --script tools/ears/drumloop.py $O/loop_$1.wav --bpm $1 >/dev/null; echo $O/loop_$1.wav; fi; }
 r() { name=$1; bpm=$2; shift 2; $R --engine tape --in "$(loop $bpm)" --out $O/$name.wav --bpm $bpm --dry 1 --wet 0.7 "$@" >/dev/null; echo "  $name"; }
 BPMS=${S8_BPM:-"90 120 140"}
 echo "== synced, 1/8 on head 1, mode 1, defaults"
@@ -27,10 +27,5 @@ r 09_drive_0 $B --div 0.5 --params mode=4,intensity=0.9,drive=0
 r 10_drive_12 $B --div 0.5 --params mode=4,intensity=0.9,drive=12
 r 11_runaway_1.1 $B --div 0.5 --params mode=4,intensity=1.1 --sched "9.0:intensity=0.5"
 # float WAVs above 0 dBFS clip in most players: normalise each file to -1 dBFS peak (loudness between files is NOT kept)
-uv run --quiet --with numpy python3 - $O/[01]*.wav <<'PY'
-import sys, numpy as np
-for p in sys.argv[1:]:
-    b = open(p, 'rb').read(); x = np.frombuffer(b[44:], dtype='<f4'); g = 10 ** (-1 / 20) / max(np.abs(x).max(), 1e-9)
-    open(p, 'wb').write(b[:44] + (x * g).astype('<f4').tobytes())
-PY
+uv run --quiet --locked --script tools/ears/normalise.py $O/[01]*.wav
 echo "done (each file normalised to -1 dBFS peak): $(pwd)/$O"

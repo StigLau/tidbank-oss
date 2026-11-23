@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Proves every analyzer on synthetic signals with known answers, independent of any engine.
-If an engine test fails later, the measurement is not the suspect. Run: uv run --with numpy tools/ears/selftest.py"""
+If an engine test fails later, the measurement is not the suspect. Run: make ears CASE=selftest"""
 import os, sys
 import numpy as np
 sys.path.insert(0, os.path.dirname(__file__))
