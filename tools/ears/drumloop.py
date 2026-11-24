@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["numpy"]
+# ///
 """Deterministic synthetic drum loop (kick, snare, closed hat) at an exact tempo, float32 mono WAV.
 For the S8 listening gate: bars of groove, then bars of silence so the echo tails are heard alone.
-Usage: uv run --with numpy tools/ears/drumloop.py out.wav --bpm 120 [--bars 4] [--tail-bars 2] [--sr 48000]"""
+Usage: uv run --locked --script tools/ears/drumloop.py out.wav --bpm 120 [--bars 4] [--tail-bars 2] [--sr 48000]"""
 import argparse
 import struct
 import numpy as np

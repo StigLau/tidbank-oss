@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["numpy"]
+# ///
 """Ears suite: table of cases (render args, analyzer, judgement). Usage: suite.py [case-name-prefix].
-Run via: uv run --quiet --with numpy tools/ears/suite.py [prefix]   (or tools/ears/run_ears.sh / make ears CASE=prefix)
+Run via: uv run --quiet --locked --script tools/ears/suite.py [prefix]   (or tools/ears/run_ears.sh / make ears CASE=prefix)
 Scratch output goes to ${TMPDIR}/tidbank-ears, never the repo. Exit 1 if any case fails."""
 import json, os, subprocess, sys, time
 from dataclasses import dataclass

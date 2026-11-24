@@ -109,4 +109,4 @@ shasum -a 256 -c --ignore-missing SHA256SUMS
 ```
 That proves where the file was built, not that it is harmless. The macOS builds are not notarized by Apple. The safest install is a build from source you have audited.
 
-Found something in this project? Please [open an issue](https://github.com/StigLau/tidbank-oss/issues), or use GitHub's private vulnerability reporting if it is enabled on the repo.
+Found something in this project? Please [open an issue](https://github.com/StigLau/tidbank-oss/issues), or [report it privately](https://github.com/StigLau/tidbank-oss/security/advisories/new).

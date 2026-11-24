@@ -20,11 +20,11 @@ Perception bars used here: beat-layered timing <~10-15 ms (aim <5), echoes >50 m
 make test      # unit tests (ctest)
 make ears      # render + measure
 build/tidbank_render --out $TMPDIR/x.wav --bpm 120 --div 0.5 --fb 0.5 --dry 0 --secs 6
-uv run --with numpy tools/ears/analyze.py taps $TMPDIR/x.wav --expect-ms 250 --tol-ms 0.1
+uv run --locked --script tools/ears/analyze.py taps $TMPDIR/x.wav --expect-ms 250 --tol-ms 0.1
 ```
 `--div` is in quarter notes (0.5 = 1/8, 0.75 = dotted 1/8). Use `--dry 0` so taps are echoes only. Stimulus impulse sits at 0.1 s (`--onset-s` in analyze). Scratch output goes to `$TMPDIR`, never into the repo.
 
-Python deps run through `uv run --with numpy` (system python has numpy only, no scipy; add `--with scipy` when needed). No venv in the repo.
+Python deps come from a script header plus a committed lock: `uv run --locked --script tools/ears/x.py` (hashes checked). Change or update a dependency with `uv lock --script tools/ears/x.py [--upgrade]` for all four scripts (suite, analyze, drumloop, normalise) at once, then run the full ears. `make pins` (in CI) fails on anything else. Trap: `uv run --with-requirements` does NOT check hashes, a wrong one is accepted (uv 0.6.17). No venv in the repo.
 
 ## Measurements that exist (`tools/ears/analyze.py <cmd> file.wav`)
 | cmd | measures | notes |

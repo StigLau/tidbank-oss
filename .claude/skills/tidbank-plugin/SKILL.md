@@ -73,3 +73,4 @@ Red PANIC button (UI) and automatable `panic` parameter (map a Move pad/knob to 
 - Mono in -> stereo out: both engines get the mono input; channel 1 of the buffer is not input then.
 - BBD chip noise is not exactly 0: compare "silent" BBD output with < 1e-5, not == 0.
 - Installing a test build for someone else: move the old bundles out of `~/Library/Audio/Plug-Ins/{VST3,Components}` into a temporary folder first, `cp -R` from `build/plugin-probe/TidBank_artefacts/Release`, the DAW is restarted; restore with `make plugin` from main.
+- **Linux/CI builds** (public repo `build.yml`): JUCE needs `libxi-dev` (XInput2.h) besides the usual X11 packages, and `--no-install-recommends` drops `make`. Release builds set `CMAKE_OSX_DEPLOYMENT_TARGET=11.0`, or the plugin only loads on the runner's macOS. auval needs the AU in `~/Library/Audio/Plug-Ins/Components`, so `tools/release/validate.sh` refuses outside CI.

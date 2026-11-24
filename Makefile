@@ -2,15 +2,17 @@
 CMAKE ?= /opt/homebrew/bin/cmake
 B := build
 JUCE_SRC ?=# optional: an already fetched JUCE checkout (read-only), skips the download: make check JUCE_SRC=...
-.PHONY: help check build test ears s8 plugin plugin-test plugin-check plugin-probe plugin-probe-test pluginval midi-sweep ui clean
+.PHONY: help check pins build test ears s8 plugin plugin-test plugin-check plugin-probe plugin-probe-test pluginval midi-sweep ui clean
 .DEFAULT_GOAL := help
 help:  # this list (default). Targets marked INSTALLS copy the plugin into ~/Library/Audio/Plug-Ins
 	@printf '\033[1;36mTidBank\033[0m  make <target>\n\n'
 	@awk -F':' '/^[a-z][a-z0-9-]*:/ { t=$$1; c=$$0; sub(/^[^#]*#? ?/, "", c); if (index($$0, "#") == 0) c=""; \
 	  col = (c ~ /^INSTALLS/) ? "\033[1;33m" : "\033[1;32m"; printf "  %s%-18s\033[0m %s\n", col, t, c }' $(MAKEFILE_LIST)
 	@printf '\n  \033[2mmost used: make check (everything, no install) · make test · make ears CASE=p_ · make plugin (INSTALLS)\033[0m\n'
-check: test ears plugin-check plugin-probe-test  # everything: unit tests, ears, plugin tests with and without the probe. Never installs
+check: pins test ears plugin-check plugin-probe-test  # everything: pins, unit tests, ears, plugin tests with and without the probe. Never installs
 	@printf '\033[1;32mcheck: all passed\033[0m\n'
+pins:  # supply-chain pins: actions and JUCE by commit, Python by lock
+	@tools/check_pins.sh
 build:  # unit tests + ears renderer (JUCE-free, seconds)
 	@$(CMAKE) -B $(B) -DCMAKE_BUILD_TYPE=Release >/dev/null && $(CMAKE) --build $(B) -j
 test: build  # unit tests (ctest)
